@@ -12,7 +12,7 @@ SCREEN_SIZE = [600, 450]
 class ShowMap(QWidget):
     def __init__(self):
         super().__init__()
-        self.spn = 20
+        self.z = 20
         self.image = QLabel(self)
         self.image.move(0, 0)
         self.image.resize(600, 450)
@@ -21,7 +21,7 @@ class ShowMap(QWidget):
         self.getImage()
 
     def getImage(self):
-        map_request = f"http://static-maps.yandex.ru/1.x/?ll={self.y},{self.x}&z={self.spn}&l=map"
+        map_request = f"http://static-maps.yandex.ru/1.x/?ll={self.y},{self.x}&z={self.z}&l=map"
         response = requests.get(map_request)
 
         if not response:
@@ -38,16 +38,15 @@ class ShowMap(QWidget):
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_PageUp:
-            if self.spn + 1 >= 21:
+            if self.z + 1 >= 21:
                 return
-            self.spn += 1
+            self.z += 1
             self.getImage()
         if event.key() == Qt.Key_PageDown:
-            if self.spn - 1 <= 0:
+            if self.z - 1 <= 0:
                 return
-            self.spn -= 1
+            self.z -= 1
             self.getImage()
-        print(self.spn)
 
     def initUI(self):
         self.setGeometry(100, 100, *SCREEN_SIZE)
