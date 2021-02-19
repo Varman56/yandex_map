@@ -13,7 +13,9 @@ class ShowMap(QWidget):
     def __init__(self):
         super().__init__()
         self.spn = 20
-        self.image = None
+        self.image = QLabel(self)
+        self.image.move(0, 0)
+        self.image.resize(600, 450)
         self.x, self.y = input().split(', ')
         self.initUI()
         self.getImage()
@@ -27,9 +29,13 @@ class ShowMap(QWidget):
             print(map_request)
             print("Http статус:", response.status_code, "(", response.reason, ")")
             sys.exit(1)
-        if os.path.exists('map.png'):
-            os.remove('map.png')
-        self.img = ImageQt.ImageQt(Image.open(BytesIO(response.content)))
+        self.map_file = "map.png"
+        with open(self.map_file, "wb") as file:
+            file.write(response.content)
+        self.pixmap = QPixmap(self.map_file)
+        self.image.setPixmap(self.pixmap)
+        os.remove('map.png')
+
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_PageUp:
             if self.spn + 1 >= 21:
