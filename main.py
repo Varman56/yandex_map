@@ -42,7 +42,6 @@ class ShowMap(QMainWindow):
             'pt': self.pt
 
         }
-        print(params)
         map_request = f"http://static-maps.yandex.ru/1.x/?"
         response = requests.get(map_request, params=params)
 
