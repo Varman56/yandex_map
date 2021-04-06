@@ -12,6 +12,7 @@ SCREEN_SIZE = [600, 450]
 class ShowMap(QWidget):
     def __init__(self):
         super().__init__()
+        self.typ = "map"
         self.z = 17
         self.image = QLabel(self)
         self.image.move(0, 0)
@@ -21,8 +22,14 @@ class ShowMap(QWidget):
         self.getImage()
 
     def getImage(self):
-        map_request = f"http://static-maps.yandex.ru/1.x/?ll={self.y},{self.x}&z={self.z}&l=map"
-        response = requests.get(map_request)
+        params = {
+            "ll": f"{self.y},{self.x}",
+            "z": str(self.z),
+            "l": self.typ
+
+        }
+        map_request = f"http://static-maps.yandex.ru/1.x/?"
+        response = requests.get(map_request, params=params)
 
         if not response:
             print("Ошибка выполнения запроса:")
@@ -51,16 +58,18 @@ class ShowMap(QWidget):
             self.y += 0.025 * math.pow(2, 15 - self.z)
         if event.key() == Qt.Key_Down and self.y < 85:
             self.x -= 0.008 * math.pow(2, 15 - self.z)
+            if self.x < -85:
+                self.x = -85
         if event.key() == Qt.Key_Up and self.y > -85:
             self.x += 0.008 * math.pow(2, 15 - self.z)
-        if self.y < -180:
-            self.y = -180
-        if self.y > 180:
-            self.y = 180
-        if self.x < -85:
-            self.x = -85
-        if self.x > 85:
-            self.x = 85
+            if self.x > 85:
+                self.x = 85
+        if event.key() == Qt.Key_1:
+            self.typ = "map"
+        if event.key() == Qt.Key_2:
+            self.typ = "sat"
+        if event.key() == Qt.Key_3:
+            self.typ = "sat,skl"
         self.getImage()
 
     def initUI(self):
