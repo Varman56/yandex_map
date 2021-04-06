@@ -21,6 +21,7 @@ class ShowMap(QMainWindow):
         self.typ = "map"
         self.z = 17
         self.x, self.y = 0, 0
+        self.pt = None
         self.image = self.label
         self.image.move(0, 0)
         self.image.resize(600, 450)
@@ -37,9 +38,11 @@ class ShowMap(QMainWindow):
         params = {
             "ll": f"{self.y},{self.x}",
             "z": str(self.z),
-            "l": self.typ
+            "l": self.typ,
+            'pt': self.pt
 
         }
+        print(params)
         map_request = f"http://static-maps.yandex.ru/1.x/?"
         response = requests.get(map_request, params=params)
 
@@ -110,6 +113,7 @@ class ShowMap(QMainWindow):
                     0][
                     "GeoObject"]
             self.y, self.x = tuple(map(float, toponym['Point']['pos'].split()))
+            self.pt = f'{self.y},{self.x},comma'
             return
         print("Ошибка выполнения запроса:")
         print(geocoder_request)
