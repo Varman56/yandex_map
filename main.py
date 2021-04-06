@@ -1,6 +1,6 @@
 import os
 import sys
-from io import BytesIO
+import math
 import requests
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel
@@ -12,11 +12,11 @@ SCREEN_SIZE = [600, 450]
 class ShowMap(QWidget):
     def __init__(self):
         super().__init__()
-        self.z = 20
+        self.z = 17
         self.image = QLabel(self)
         self.image.move(0, 0)
         self.image.resize(600, 450)
-        self.x, self.y = input().split(', ')
+        self.x, self.y = map(float, input().split(', '))
         self.initUI()
         self.getImage()
 
@@ -38,15 +38,30 @@ class ShowMap(QWidget):
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_PageUp:
-            if self.z + 1 >= 21:
+            if self.z + 1 >= 18:
                 return
             self.z += 1
-            self.getImage()
         if event.key() == Qt.Key_PageDown:
             if self.z - 1 <= 0:
                 return
             self.z -= 1
-            self.getImage()
+        if event.key() == Qt.Key_Left:
+            self.y -= 0.025 * math.pow(2, 15 - self.z)
+        if event.key() == Qt.Key_Right:
+            self.y += 0.025 * math.pow(2, 15 - self.z)
+        if event.key() == Qt.Key_Down and self.y < 85:
+            self.x -= 0.008 * math.pow(2, 15 - self.z)
+        if event.key() == Qt.Key_Up and self.y > -85:
+            self.x += 0.008 * math.pow(2, 15 - self.z)
+        if self.y < -180:
+            self.y = -180
+        if self.y > 180:
+            self.y = 180
+        if self.x < -85:
+            self.x = -85
+        if self.x > 85:
+            self.x = 85
+        self.getImage()
 
     def initUI(self):
         self.setGeometry(100, 100, *SCREEN_SIZE)
