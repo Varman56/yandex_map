@@ -18,6 +18,7 @@ class ShowMap(QMainWindow):
         self.req_text.setEnabled(False)
         self.find_btn.setEnabled(False)
         self.find_btn.clicked.connect(self.getImage)
+        self.reset_btn.clicked.connect(self.reset_res)
         self.typ = "map"
         self.z = 17
         self.x, self.y = 0, 0
@@ -28,11 +29,15 @@ class ShowMap(QMainWindow):
         self.ad = ''
         self.initUI()
 
-    def getImage(self):
+    def reset_res(self):
+        self.pt = None
+        self.getImage()
+
+    def getImage(self, pt=False):
         resp = self.req_text.text()
         if not resp:
             return
-        if not self.ad or self.ad != resp:
+        if not self.ad or pt:
             self.ad = resp
             self.get_pos(resp)
         params = {
@@ -48,7 +53,8 @@ class ShowMap(QMainWindow):
         if not response:
             print("Ошибка выполнения запроса:")
             print(map_request)
-            print("Http статус:", response.status_code, "(", response.reason,
+            print("Http статус:", response.status_code, "(",
+                  response.reason,
                   ")")
             sys.exit(1)
         self.map_file = "map.png"
@@ -90,6 +96,9 @@ class ShowMap(QMainWindow):
             self.req_text.setEnabled(self.is_enable)
             self.find_btn.setEnabled(self.is_enable)
             self.setFocus()
+            if not self.is_enable:
+                self.getImage(True)
+            return
         else:
             return
         self.getImage()
