@@ -6,7 +6,6 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtCore import Qt
 from PyQt5 import uic
-from pprint import pprint
 
 SCREEN_SIZE = [600, 450]  # размеры экрана
 
