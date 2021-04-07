@@ -20,6 +20,7 @@ class ShowMap(QMainWindow):
         self.find_btn.setEnabled(False)
         self.find_btn.clicked.connect(self.getImage)
         self.reset_btn.clicked.connect(self.reset_res)
+        self.postal_code.stateChanged.connect(self.add_post_code)
         self.typ = "map"
         self.z = 17
         self.x, self.y = 0, 0
@@ -29,7 +30,14 @@ class ShowMap(QMainWindow):
         self.image.resize(600, 450)
         self.ad = ''
         self.full_address = ''
+        self.post = ''
         self.initUI()
+
+    def add_post_code(self):
+        if self.postal_code.isChecked():
+            self.adress.setText(self.full_address + ' ' + self.post)
+        else:
+            self.adress.setText(self.full_address)
 
     def reset_res(self):
         self.pt = None
@@ -124,10 +132,22 @@ class ShowMap(QMainWindow):
                     "featureMember"][
                     0][
                     "GeoObject"]
-            self.full_address = \
-                toponym['metaDataProperty']['GeocoderMetaData']['Address'][
-                    'formatted']
-            self.adress.setText(self.full_address)
+            try:
+                self.full_address = \
+                    toponym['metaDataProperty']['GeocoderMetaData']['Address'][
+                        'formatted']
+            except Exception:
+                self.full_address = '---'
+            try:
+                self.post = \
+                    toponym['metaDataProperty']['GeocoderMetaData']['Address'][
+                        'postal_code']
+            except Exception:
+                self.post = '------'
+            r = self.full_address
+            if self.postal_code.isChecked():
+                r += ' ' + self.post
+            self.adress.setText(r)
             self.y, self.x = tuple(map(float, toponym['Point']['pos'].split()))
             self.pt = f'{self.y},{self.x},comma'
             return

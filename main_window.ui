@@ -77,6 +77,13 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QCheckBox" name="postal_code">
+          <property name="text">
+           <string>Почтовый индекс</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
       <item>
