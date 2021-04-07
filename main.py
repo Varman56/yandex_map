@@ -6,6 +6,7 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtCore import Qt
 from PyQt5 import uic
+from pprint import pprint
 
 SCREEN_SIZE = [600, 450]  # размеры экрана
 
@@ -27,10 +28,13 @@ class ShowMap(QMainWindow):
         self.image.move(0, 0)
         self.image.resize(600, 450)
         self.ad = ''
+        self.full_address = ''
         self.initUI()
 
     def reset_res(self):
         self.pt = None
+        self.full_address = ''
+        self.adress.setText(self.full_address)
         self.getImage()
 
     def getImage(self, pt=False):
@@ -120,6 +124,10 @@ class ShowMap(QMainWindow):
                     "featureMember"][
                     0][
                     "GeoObject"]
+            self.full_address = \
+                toponym['metaDataProperty']['GeocoderMetaData']['Address'][
+                    'formatted']
+            self.adress.setText(self.full_address)
             self.y, self.x = tuple(map(float, toponym['Point']['pos'].split()))
             self.pt = f'{self.y},{self.x},comma'
             return
