@@ -86,6 +86,13 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QPushButton" name="help_btn">
+        <property name="text">
+         <string>Справка</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
    </layout>
