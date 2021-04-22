@@ -16,8 +16,6 @@ class ShowMap(QMainWindow):
         uic.loadUi('main_window.ui', self)
         self.is_enable = False
         self.req_text.setEnabled(False)
-        self.find_btn.setEnabled(False)
-        self.find_btn.clicked.connect(self.getImage)
         self.reset_btn.clicked.connect(self.reset_res)
         self.postal_code.stateChanged.connect(self.add_post_code)
         self.typ = "map"
@@ -44,13 +42,14 @@ class ShowMap(QMainWindow):
         self.adress.setText(self.full_address)
         self.getImage()
 
-    def getImage(self, pt=False):
-        resp = self.req_text.text()
-        if not resp:
-            return
-        if not self.ad or pt:
-            self.ad = resp
-            self.get_pos(resp)
+    def getImage(self, pt=False, mouse_req=False):
+        if not mouse_req:
+            resp = self.req_text.text()
+            if not resp:
+                return
+            if not self.ad or pt:
+                self.ad = resp
+                self.get_pos(resp)
         params = {
             "ll": f"{self.y},{self.x}",
             "z": str(self.z),
@@ -88,11 +87,11 @@ class ShowMap(QMainWindow):
             self.y -= 0.025 * math.pow(2, 15 - self.z)
         elif event.key() == Qt.Key_Right:
             self.y += 0.025 * math.pow(2, 15 - self.z)
-        elif event.key() == Qt.Key_Down and self.y < 85:
+        elif event.key() == Qt.Key_Down and self.x < 85:
             self.x -= 0.008 * math.pow(2, 15 - self.z)
             if self.x < -85:
                 self.x = -85
-        elif event.key() == Qt.Key_Up and self.y > -85:
+        elif event.key() == Qt.Key_Up and self.x > -85:
             self.x += 0.008 * math.pow(2, 15 - self.z)
             if self.x > 85:
                 self.x = 85
@@ -105,7 +104,6 @@ class ShowMap(QMainWindow):
         elif event.key() == Qt.Key_Return:
             self.is_enable = not self.is_enable
             self.req_text.setEnabled(self.is_enable)
-            self.find_btn.setEnabled(self.is_enable)
             self.setFocus()
             if not self.is_enable:
                 self.getImage(True)
@@ -117,6 +115,14 @@ class ShowMap(QMainWindow):
     def initUI(self):
         self.setGeometry(100, 100, *SCREEN_SIZE)
         self.setWindowTitle('Отображение карты')
+
+    def to_geo_coords(self, pos):
+        dx = 225 - pos[1]
+        dy = pos[0] - 300
+        lx = self.x + dx * 0.00002 * math.pow(2, 15 - self.z)
+        ly = self.y + dy * 0.00004 * math.cos(
+            math.radians(self.y)) * math.pow(2, 15 - self.z)
+        return lx, ly
 
     def get_pos(self, address):
         params = {"apikey": "40d1649f-0493-4b70-98ba-98533de7710b",
@@ -153,6 +159,12 @@ class ShowMap(QMainWindow):
         print("Ошибка выполнения запроса:")
         print(geocoder_request)
         print("Http статус:", response.status_code, "(", response.reason, ")")
+
+    def mousePressEvent(self, event):
+        if event.buttons() == Qt.LeftButton:
+            x, y = self.to_geo_coords((event.x(), event.y()))
+            self.get_pos(f"{y},{x}")
+            self.getImage(mouse_req=True)
 
 
 def except_hook(cls, exception, traceback):
